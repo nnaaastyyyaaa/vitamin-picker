@@ -1,0 +1,20 @@
+{
+  "name": "vitamin-picker",
+  "version": "1.0.0",
+  "description": "You can select your problems and get different recommendations for taking the appropriate vitamins",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nnaaastyyyaaa/vitamin-picker.git"
+  },
+  "author": "Andrienko Anastasia, Dunaeva Veronika",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nnaaastyyyaaa/vitamin-picker/issues"
+  },
+  "homepage": "https://github.com/nnaaastyyyaaa/vitamin-picker#readme"
+}
