@@ -67,15 +67,15 @@ input {
   width: 250px;
   height: 25px;
 }
-<<<<<<< HEAD
+/* <<<<<<< HEAD */
 
 input:focus {
   border: none;
   outline: none;
 }
 
-=======
->>>>>>> bc8a7eaa5b6ccc41b268874da5db864d683dc4f1
+/* =======
+>>>>>>> bc8a7eaa5b6ccc41b268874da5db864d683dc4f1 */
 .password-container {
   position: relative;
 }
