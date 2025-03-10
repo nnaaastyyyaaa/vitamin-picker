@@ -1,0 +1,69 @@
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  background-color: aliceblue;
+}
+
+.box {
+  display: grid;
+  margin: auto;
+  background-color: #1098ad;
+  width: 50%;
+  border-radius: 20px;
+}
+
+form {
+  margin: auto;
+  display: grid;
+}
+
+h1,
+.p1 {
+  text-align: center;
+}
+
+h1,
+.p1,
+form {
+  color: aliceblue;
+}
+
+.link,
+.link:visited {
+  background-color: #22b8cf;
+  border-radius: 8px;
+  text-decoration: none;
+  color: aliceblue;
+  padding: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.link:hover
+/* .btn:visited,
+.btn:active */ {
+  background-color: #0c8599;
+}
+
+.button-create-profile {
+  font-family: 'Inter', sans-serif;
+  background-color: #f783ac;
+  color: #fff;
+  border: none;
+  padding: 5px;
+  border-radius: 10px;
+  box-shadow: 5px 8px 10px rgb(12, 133, 153, 0.5);
+}
+
+.button-create-profile:hover,
+.button-create-profile:visited {
+  background-color: #e64980;
+}
+
+input {
+  background-color: #ffdeeb;
+  border: none;
+  border-radius: 8px;
+  width: 250px;
+  height: 25px;
+}
