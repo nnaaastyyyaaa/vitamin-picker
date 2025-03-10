@@ -67,3 +67,14 @@ input {
   width: 250px;
   height: 25px;
 }
+.password-container {
+  position: relative;
+}
+
+#togglePassword {
+  position: absolute;
+  right: 10px;
+  color: rgb(71, 70, 70);
+  cursor: pointer;
+  font-size: 18px;
+}
