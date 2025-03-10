@@ -1,0 +1,13 @@
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  background-color: #f8f0fc;
+}
+
+header {
+  background-color: #c2255c;
+  color: #fff;
+  margin: auto;
+
+  /* display: grid; */
+}

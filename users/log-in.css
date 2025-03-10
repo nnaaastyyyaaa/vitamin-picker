@@ -67,3 +67,8 @@ input {
   width: 250px;
   height: 25px;
 }
+
+input:focus {
+  border: none;
+  outline: none;
+}
