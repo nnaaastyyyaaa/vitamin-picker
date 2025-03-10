@@ -3,7 +3,9 @@ const User = require('./userSchema');
 exports.createUser = async (req, res) => {
   try {
     const { username, eMail, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const strPassword = String(password);
+    const hashedPassword = await bcrypt.hash(strPassword, 10);
     const newUser = await User.create({
       username,
       eMail,
@@ -27,8 +29,8 @@ exports.checkUser = async (req, res) => {
         message: 'Any user found',
       });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
+    const strPassword = String(password);
+    const isMatch = await bcrypt.compare(strPassword, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid password!' });
     }

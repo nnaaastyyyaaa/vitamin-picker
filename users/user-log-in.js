@@ -3,6 +3,7 @@ const labelUsername = document.querySelector('.username');
 const labelPassword = document.querySelector('.password');
 const labelMessage = document.querySelector('.message');
 const btnCreate = document.querySelector('.button-create-profile');
+const btnVisible = document.getElementById('togglePassword');
 
 const API = 'http://localhost:3000/api/login';
 
@@ -29,5 +30,13 @@ btnCreate.addEventListener('click', async (e) => {
     }
   } catch (err) {
     console.log('Error!');
+  }
+});
+
+btnVisible.addEventListener('click', () => {
+  if (labelPassword.type === 'password') {
+    labelPassword.type = 'text';
+  } else if (labelPassword.type === 'text') {
+    labelPassword.type = 'password';
   }
 });
