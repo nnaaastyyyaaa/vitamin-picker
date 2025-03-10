@@ -31,12 +31,18 @@ btnCreate.addEventListener('click', async (e) => {
         labelUsername.value = '';
         labelPassword1.value = '';
         labelPassword2.value = '';
+        setTimeout(() => {
+          labelMessage1.textContent = '';
+        }, 4000);
       }
     } catch (err) {
       console.log('Error!');
     }
   } else {
     labelMessage2.textContent = 'Password should be identical!';
+    setTimeout(() => {
+      labelMessage2.textContent = '';
+    }, 4000);
   }
 });
 
