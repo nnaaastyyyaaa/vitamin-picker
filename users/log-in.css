@@ -73,7 +73,7 @@ input {
 
 #togglePassword {
   position: absolute;
-  right: 10px;
+  right: 10px; /* Розміщуємо іконку праворуч */
   color: rgb(71, 70, 70);
   cursor: pointer;
   font-size: 18px;
