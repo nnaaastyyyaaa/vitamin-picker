@@ -1,0 +1,35 @@
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  background-color: #f8f8f8;
+}
+
+header {
+  background-color: #eebefa;
+
+  color: #fff0f5;
+  font-weight: 500;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+}
+
+.btn--home {
+  grid-column: 1/2;
+  text-align: center;
+}
+
+h1 {
+  grid-column: 2/3;
+  text-align: center;
+
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.btn--user {
+  grid-column: -1/-2;
+  text-align: center;
+}
