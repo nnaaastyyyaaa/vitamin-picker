@@ -1,3 +1,5 @@
+'use strict';
+
 const bcrypt = require('bcryptjs');
 const User = require('./userSchema');
 exports.createUser = async (req, res) => {
@@ -35,6 +37,27 @@ exports.checkUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid password!' });
     }
 
+    res.status(200).json({ message: 'Successfuly!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { eMail, username, password } = req.body;
+    const strPassword = String(password);
+    const hashedPassword = await bcrypt.hash(strPassword, 10);
+    const user = await User.findOneAndUpdate(
+      { eMail, username },
+      { password: hashedPassword },
+      { new: true, runValidators: true },
+    );
+    if (!user) {
+      return res.status(404).json({
+        message: 'Any user found with this email and username',
+      });
+    }
     res.status(200).json({ message: 'Successfuly!' });
   } catch (err) {
     res.status(500).json({ error: err.message });
