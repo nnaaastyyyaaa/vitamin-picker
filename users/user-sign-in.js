@@ -1,3 +1,5 @@
+'use strict';
+
 const labelLogin = document.querySelector('.login');
 const labelPassword = document.querySelector('.password');
 const signIn = document.querySelector('.button-sign-in');

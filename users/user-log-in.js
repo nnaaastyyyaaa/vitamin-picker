@@ -1,3 +1,5 @@
+'use strict';
+
 const labeleMail = document.querySelector('.e-mail');
 const labelUsername = document.querySelector('.username');
 const labelPassword1 = document.querySelector('.password1');
@@ -39,7 +41,7 @@ btnCreate.addEventListener('click', async (e) => {
       console.log('Error!');
     }
   } else {
-    labelMessage2.textContent = 'Password should be identical!';
+    labelMessage2.textContent = 'Passwords should be identical!';
     setTimeout(() => {
       labelMessage2.textContent = '';
     }, 4000);
