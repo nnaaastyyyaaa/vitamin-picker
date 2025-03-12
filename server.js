@@ -5,16 +5,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
-const { createUser } = require('./users/userControler');
-const { checkUser } = require('./users/userControler');
-const { resetPassword } = require('./users/userControler');
+const usersRouts = require('./routs/usersRouts');
 
 dotenv.config({ path: './config.env' });
-
-const router = express.Router();
-router.post('/login', createUser);
-router.post('/sign-in', checkUser);
-router.patch('/reset', resetPassword);
 
 const DB = process.env.DATABASE.replace('<db_password>', process.env.PASSWORD);
 mongoose.connect(DB).then(() => {
@@ -24,7 +17,7 @@ mongoose.connect(DB).then(() => {
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use('/api', router);
+app.use('/api', usersRouts);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

@@ -23,7 +23,7 @@ signIn.addEventListener('click', async (e) => {
 
     if (response.ok) {
       setTimeout(
-        () => (window.location.href = './user-account-page.html'),
+        () => (window.location.href = '../user-account/user-account-page.html'),
         1000,
       );
     }
