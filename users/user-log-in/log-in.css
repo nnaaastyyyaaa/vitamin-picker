@@ -1,15 +1,18 @@
 body {
   font-family: 'Inter', sans-serif;
-  font-size: 16px;
-  background-color: #e3fafc;
+  font-size: clamp(8px, 1rem, 36px);
+  background-color: #e7fcf5;
 }
 
 .box {
   display: grid;
   margin: auto;
-  background-color: #1098ad;
+  padding: 15px;
+  background-color: #077f5b;
   width: 50%;
-  border-radius: 20px;
+  max-width: 370px;
+  min-width: 270px;
+  border-radius: 40px;
 }
 
 form {
@@ -25,16 +28,17 @@ h1,
 h1,
 .p1,
 form {
-  color: aliceblue;
+  color: #fff;
 }
 
 .link,
 .link:visited {
-  background-color: #22b8cf;
+  background-color: #20c997;
   border-radius: 8px;
   text-decoration: none;
-  color: aliceblue;
+  color: #fff;
   padding: 5px;
+  margin-right: 10px;
   font-size: 14px;
   box-sizing: border-box;
 }
@@ -42,7 +46,7 @@ form {
 .link:hover
 /* .btn:visited,
 .btn:active */ {
-  background-color: #0c8599;
+  background-color: #0ca678;
 }
 
 .button-create-profile {
@@ -52,7 +56,7 @@ form {
   border: none;
   padding: 5px;
   border-radius: 10px;
-  box-shadow: 5px 8px 10px rgb(12, 133, 153, 0.5);
+  box-shadow: 0px 10px 15px rgb(4, 63, 45, 0.1);
 }
 
 .button-create-profile:hover,
@@ -61,16 +65,17 @@ form {
 }
 
 input {
-  background-color: #ffdeeb;
+  background-color: #fcc2d8;
   border: none;
   border-radius: 8px;
-  width: 250px;
+  width: 100%;
   height: 25px;
 }
 
 input:focus {
   border: none;
   outline: none;
+  box-shadow: 0px 10px 15px rgb(4, 63, 45, 0.2);
 }
 
 .password-container {
