@@ -1,0 +1,45 @@
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="sign-up.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication</title>
+  </head>
+  <body>
+    <div class="box">
+      <h1>Authentication</h1>
+      <p class="p1">Create your profile</p>
+      <form>
+        Create username:
+        <input type="text" class="username" class="text-field" /><br />
+        Enter your e-mail:
+        <input type="text" class="e-mail" class="text-field" /><br />
+        Create a password:
+        <div class="password-container">
+          <input type="password" class="password1" />
+          <span id="togglePassword">👁</span>
+        </div>
+        <br />
+        Repeat your password
+        <div class="password-container">
+          <input type="password" class="password2" />
+          <span id="togglePassword">👁</span>
+        </div>
+        <p class="message1"></p>
+        <button type="button" class="main--btn">Create a profile</button>
+        <p class="message2"></p>
+        <p>
+          Has already own profile?
+          <a href="../user-log-in/log-in.html" class="link">Log in</a>
+        </p>
+      </form>
+    </div>
+  </body>
+</html>
+<script src="sign-up.js"></script>
