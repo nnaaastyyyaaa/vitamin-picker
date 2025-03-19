@@ -2,7 +2,8 @@
 
 const labelLogin = document.querySelector('.login');
 const labelPassword = document.querySelector('.password');
-const signIn = document.querySelector('.button-sign-in');
+const labelMessage = document.querySelector('.message1');
+const signIn = document.querySelector('.main--btn');
 
 const API = 'http://localhost:3000/api/sign-in';
 
@@ -21,13 +22,22 @@ signIn.addEventListener('click', async (e) => {
       body: JSON.stringify({ login, password }),
     });
 
+    const jsonResponse = await response.json();
+
     if (response.ok) {
       setTimeout(
         () => (window.location.href = '../user-account/user-account-page.html'),
         1000,
       );
+    } else {
+      throw new Error(jsonResponse.message);
     }
   } catch (err) {
-    console.log('Error!');
+    labelMessage.textContent = err.message;
+    labelLogin.value = '';
+    labelPassword.value = '';
+    setTimeout(() => {
+      labelMessage.textContent = '';
+    }, 4000);
   }
 });

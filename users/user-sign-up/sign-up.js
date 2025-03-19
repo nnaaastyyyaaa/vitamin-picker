@@ -6,7 +6,7 @@ const labelPassword1 = document.querySelector('.password1');
 const labelPassword2 = document.querySelector('.password2');
 const labelMessage1 = document.querySelector('.message2');
 const labelMessage2 = document.querySelector('.message1');
-const btnCreate = document.querySelector('.button-create-profile');
+const btnCreate = document.querySelector('.main--btn');
 const btnVisible = document.querySelectorAll('#togglePassword');
 
 const API = 'http://localhost:3000/api/login';
@@ -17,34 +17,37 @@ btnCreate.addEventListener('click', async (e) => {
   const username = labelUsername.value;
   const password = labelPassword1.value;
   const password1 = labelPassword2.value;
-  if (password === password1) {
-    try {
-      const response = await fetch(API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ eMail, username, password }),
-      });
+  console.log(eMail, username, password, password1);
+  try {
+    const response = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eMail,
+        username,
+        password,
+        passwordRepeat: password1,
+      }),
+    });
 
-      if (response.ok) {
-        labelMessage1.textContent = 'Successfully registered!';
-        labeleMail.value = '';
-        labelUsername.value = '';
-        labelPassword1.value = '';
-        labelPassword2.value = '';
-        setTimeout(() => {
-          labelMessage1.textContent = '';
-        }, 4000);
-      }
-    } catch (err) {
-      console.log('Error!');
+    const responseJson = await response.json();
+
+    if (response.ok) {
+      labelMessage1.textContent = 'Successfully registered!';
+      labeleMail.value = '';
+      labelUsername.value = '';
+      labelPassword1.value = '';
+      labelPassword2.value = '';
+      setTimeout(() => {
+        labelMessage1.textContent = '';
+      }, 4000);
+    } else {
+      throw new Error(responseJson.message);
     }
-  } else {
-    labelMessage2.textContent = 'Passwords should be identical!';
-    setTimeout(() => {
-      labelMessage2.textContent = '';
-    }, 4000);
+  } catch (err) {
+    labelMessage1.textContent = err.message;
   }
 });
 
