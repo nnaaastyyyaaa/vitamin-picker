@@ -1,5 +1,5 @@
 'use strict';
-
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords aren`t the same',
     },
   },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpire: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -44,6 +47,16 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.checkPassword = async function (inputPassword, dbPassword) {
   return await bcrypt.compare(inputPassword, dbPassword);
+};
+
+userSchema.methods.createResetToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  this.passwordResetExpire = Date.now() + 15 * 60 * 1000;
+  return token;
 };
 
 const User = mongoose.model('User', userSchema);

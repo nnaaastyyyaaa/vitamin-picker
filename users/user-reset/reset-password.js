@@ -1,7 +1,5 @@
 'use strict';
 
-const labelEMail = document.querySelector('.login');
-const labelUsername = document.querySelector('.username');
 const labelNewPassword1 = document.querySelector('.password1');
 const labelNewPassword2 = document.querySelector('.password2');
 const labelMessage1 = document.querySelector('.message2');
@@ -9,15 +7,15 @@ const labelMessage2 = document.querySelector('.message1');
 const btnReset = document.querySelector('.button-reset');
 const btnVisible = document.querySelectorAll('#togglePassword');
 
-const API = 'http://localhost:3000/api/reset';
+const API = `http://localhost:3000/api/reset/${window.location.pathname
+  .split('/')
+  .pop()}`;
 
 btnReset.addEventListener('click', async (e) => {
   e.preventDefault();
 
   const password = labelNewPassword1.value;
   const password1 = labelNewPassword2.value;
-  const eMail = labelEMail.value;
-  const username = labelUsername.value;
 
   if (password === password1) {
     try {
@@ -26,12 +24,10 @@ btnReset.addEventListener('click', async (e) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ eMail, username, password }),
+        body: JSON.stringify({ password, password1 }),
       });
       if (response.ok) {
         labelMessage2.textContent = 'Successfully changed your password!';
-        labelEMail.value = '';
-        labelUsername.value = '';
         labelNewPassword1.value = '';
         labelNewPassword2.value = '';
         setTimeout(() => {

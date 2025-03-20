@@ -35,6 +35,7 @@ btnCreate.addEventListener('click', async (e) => {
     const responseJson = await response.json();
 
     if (response.ok) {
+      localStorage.setItem('token', responseJson.token);
       labelMessage1.textContent = 'Successfully registered!';
       labeleMail.value = '';
       labelUsername.value = '';
