@@ -1,18 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const catalogueController = require(`controllers/catalogueController.js`);
+const fastify = require('fastify')({ logger: true });
+// const router = express.Router();
 
-router.param('id', catalogueController.checkId);
+// fastify.param('id');
 
-router
-  .route('/')
-  .get(catalogueController.getAllVitamins)
-  .post(catalogueController.createVitamin);
+// fastify.route('/').get().post();
 
-router
-  .route(':id')
-  .get(catalogueController.getVitamin)
-  .patch(catalogueController.updateVitamin)
-  .delete(catalogueController.deleteVitamin);
+// fastify.route(':id').get().patch().delete();
 
-module.exports = router;
+// module.exports = router;
