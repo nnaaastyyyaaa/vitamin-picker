@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const catalogueController = require(`controllers/catalogueController.js`);
+const catalogueController = require('../controllers/catalogueController');
 
-router.param('id', catalogueController.checkId);
+router.param('id', catalogueController.checkID);
 
 router
   .route('/')

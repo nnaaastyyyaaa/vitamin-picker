@@ -1,7 +1,9 @@
 const fs = require('fs');
 const { validateHeaderName } = require('http');
 
-const vitamins = JSON.parse(fs.readFileSync(`vitamins/vitamins-data.json`));
+// const vitamins = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../vitamins/vitamins-data.json`),
+// );
 
 exports.checkID = (req, res, next, val) => {
   if (req.params.id * 1 > vitamins.length) {
