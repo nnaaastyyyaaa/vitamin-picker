@@ -1,106 +1,111 @@
 'use strict';
 
 const fs = require('fs');
-const http = require('http');
-const url = require('url');
 const slugify = require('slugify');
-const replaceTemplate = require('vitamins/replaceTemplate.js');
-const { validateHeaderName } = require('http');
+const Fastify = require('fastify');
 
-const tempCatalogue = fs.readFileSync(`vitamins/catalogue.html`, 'utf-8');
-const tempCard = fs.readFileSync(`vitamins/template-card.html`, 'utf-8');
+const fastify = Fastify({ logger: true });
+const { MongoClient, ObjectId } = require('mongodb');
+const { send } = require('process');
 
-///navbar script
-// document.addEventListener('DOMContentLoaded', function () {
-//   fetch('nav.html')
-//     .then((response) => response.text())
-//     .then((data) => {
-//       document.getElementByClass('nav-container').innerHTML = data;
-//     });
-// });
+const MONGO_URL =
+  'mongodb+srv://dunaevaveronika13:eG9bV0n1I7fN9sI2@clusterv.sfvig.mongodb.net/';
+const DB_NAME = 'vitaminsDB';
 
-// const data = fs.readFileSync(`vitamins/vitamins-data.json`, 'utf-8');
-// const dataObj = JSON.parse(data);
+let db, vitaminsCollection;
 
-const slugs = dataObj.map((el) => ({
+//підключення до монгодб
+async function connectDB() {
+  const client = new MongoClient(MONGO_URL);
+  await client.connect();
+  db = client.db(DB_NAME);
+  vitaminsCollection = db.collection('vitamins');
+  console.log('підключено до mongoDB');
+}
+connectDB().catch(console.error);
+
+///const replaceTemplate = require('vitamins/replaceTemplate.js');
+// const tempCatalogue = fs.readFileSync(`vitamins/catalogue.html`, 'utf-8');
+// const tempCard = fs.readFileSync(`vitamins/template-card.html`, 'utf-8');
+// const vitamins = JSON.parse(fs.readFileSync(vitamins / vitamins - data.json));
+
+const slugs = vitamins.map((el) => ({
   ...el,
   slug: slugify(el.vitamin, { lower: true }),
 }));
 
-const vitamins = JSON.parse(fs.readFileSync(`vitamins/vitamins-data.json`));
+//error func
+const sendErrorRes = (res, statusCode, message) => {
+  return res.status(statusCode).send({ status: 'fail', message });
+};
 
-exports.checkID = (req, res, next, val) => {
-  if (req.params.id * 1 > vitamins.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid id',
-    });
+//перевірка при додаванні нового вітаміну(middlewear)
+fastify.addHook('preHandler', (req, res, done) => {
+  if (req.routerPath === '/vitamins' && req.method === 'POST') {
+    if (!req.body.name) {
+      return sendErrorRes(res, 400, 'Missing name');
+    }
   }
-  next();
-};
+  done();
+});
 
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'missing name',
-    });
+//get all vitamins
+fastify.get('/vitamins', async (req, res) => {
+  return {
+    status: 'success',
+    data: { vitamins },
+  };
+});
+
+//get vitamin by id
+fastify.get('/vitamins/:id', async (req, res) => {
+  //перевірка id
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return sendErrorRes(res, 400, 'Invalid ID');
   }
-  next();
-};
 
-exports.getAllVitamins = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    // to COMPlete
-  });
-};
+  const vitamin = await vitaminsCollection.findOne({ _id: new ObjectId(id) });
+  if (!vitamin) {
+    return sendErrorRes(res, 404, 'Vitamin not found');
+  }
 
-exports.getVitamin = (req, res) => {
-  const id = req.params.id * 1;
+  return { status: 'success', data: { vitamin } };
+});
 
-  const vitamin = vitamins.find((el) => el.id === id);
+//створити новий вітамін
+fastify.post('/vitamins', async (req, res) => {
+  try {
+    const newVitamin = {
+      name: req.body.name,
+      description: req.body.description || '',
+      slug: slugify(req.body.name, { lower: true }),
+    };
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      vitamin,
-    },
-  });
-};
+    const result = await vitaminsCollection.insertOne(newVitamin);
+    return { status: 'success', data: { vitamin: result.ops[0] } };
+  } catch (error) {
+    return sendErrorRes(res, 500, 'Помилка при створенні вітаміну');
+  }
+});
 
-exports.createVitamin = (req, res) => {
-  const newId = vitamin[vitamins.length - 1].id + 1;
-  const newVitamin = Object.assign({ id: newId }, req.body);
+fastify.delete('/vitamins', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+      return sendErrorRes(res, 400, 'Invalid id');
+    }
 
-  vitamins.push(newVitamin);
+    const result = await vitaminsCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
-  fs.writeFile(
-    `vitamins/vitamins-data.json`,
-    JSON.stringify(vitamins),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newVitamin,
-        },
-      });
-    },
-  );
-};
+    if (result.deleteCount === 0) {
+      return sendErrorRes(res, 404, 'Vitamin not found');
+    }
 
-exports.updateVitamin = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      vitamin: '<Updated vitamin here...',
-    },
-  });
-};
-
-exports.deleteVitamin = (req, res) => {
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-};
+    return { status: 'success', data: null };
+  } catch (error) {
+    return sendErrorRes(res, 500, 'Помилка видалення вітаміну');
+  }
+});
