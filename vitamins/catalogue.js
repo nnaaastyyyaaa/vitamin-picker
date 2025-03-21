@@ -10,8 +10,17 @@ const { validateHeaderName } = require('http');
 const tempCatalogue = fs.readFileSync(`vitamins/catalogue.html`, 'utf-8');
 const tempCard = fs.readFileSync(`vitamins/template-card.html`, 'utf-8');
 
-const data = fs.readFileSync(`vitamins/vitamins-data.json`, 'utf-8');
-const dataObj = JSON.parse(data);
+///navbar script
+// document.addEventListener('DOMContentLoaded', function () {
+//   fetch('nav.html')
+//     .then((response) => response.text())
+//     .then((data) => {
+//       document.getElementByClass('nav-container').innerHTML = data;
+//     });
+// });
+
+// const data = fs.readFileSync(`vitamins/vitamins-data.json`, 'utf-8');
+// const dataObj = JSON.parse(data);
 
 const slugs = dataObj.map((el) => ({
   ...el,
