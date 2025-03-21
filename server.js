@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 
 const usersRouts = require('./routs/usersRouts');
+const catalogueRouts = require('./routs/catalogueRouts');
 
 dotenv.config({ path: './config.env' });
 
@@ -18,6 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use('/api', usersRouts);
+app.use('/catalogue', catalogueRouts);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

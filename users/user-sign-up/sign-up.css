@@ -1,14 +1,13 @@
 body {
   font-family: 'Inter', sans-serif;
   font-size: clamp(8px, 1rem, 36px);
-  background-color: #e7fcf5;
+  background-color: #fff0f6;
 }
 
 .box {
   display: grid !important;
   margin: auto;
   padding: 15px;
-  background-color: #077f5b;
   width: 50%;
   max-width: 370px;
   min-width: 270px;
@@ -28,12 +27,12 @@ h1,
 h1,
 .p1,
 form {
-  color: #fff;
+  color: #087f5b;
 }
 
 .link,
 .link:visited {
-  background-color: #20c997;
+  background-color: #0ca678;
   border: none;
   border-radius: 8px;
   text-decoration: none;
@@ -47,12 +46,12 @@ form {
 .link:hover
 /* .btn:visited,
 .btn:active */ {
-  background-color: #0ca678;
+  background-color: #12b886;
 }
 
 .main--btn {
   font-family: 'Inter', sans-serif;
-  background-color: #f783ac;
+  background-color: #d6336c;
   color: #fff;
   border: none;
   padding: 5px;
@@ -68,7 +67,7 @@ form {
 .forgot--link:link,
 .forgot--link:visited,
 .forgot--link:active {
-  color: #077f5b;
+  color: #0ca678;
   font-size: 12px;
   text-align: center;
   text-decoration: none;
@@ -79,11 +78,11 @@ form {
 }
 
 .forgot--link:hover {
-  background-color: #63e6be;
+  background-color: #0ca678;
 }
 
 input {
-  background-color: #fcc2d8;
+  background-color: #fcc2d7;
   border: none;
   border-radius: 10px;
   width: 100%;
