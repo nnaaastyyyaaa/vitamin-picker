@@ -108,7 +108,7 @@ const getResetPage = async (req, res) => {
   if (!user) {
     return sendNotFound(res, 'Didn`t find user or your token has expired!');
   }
-  res.redirect('/user-reset/reset-password.html');
+  res.redirect(`/user-reset/reset-password.html?token=${req.params.token}`);
 };
 
 const resetPassword = async (req, res) => {
@@ -123,11 +123,11 @@ const resetPassword = async (req, res) => {
     return sendNotFound(res, 'Any user found ');
   }
   user.password = strPassword;
-  user.passwordConfirm = strPassword1;
+  user.passwordRepeat = strPassword1;
   user.passwordResetToken = undefined;
   user.passwordResetExpire = undefined;
   await user.save();
-  res.status(200).json({ message: 'Successfuly!' });
+  res.status(200).send({ message: 'Successfuly!' });
 };
 // const router = express.Router();
 async function userRoutes(fastify, options) {

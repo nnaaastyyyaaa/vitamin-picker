@@ -6,10 +6,8 @@ const labelMessage1 = document.querySelector('.message2');
 const labelMessage2 = document.querySelector('.message1');
 const btnReset = document.querySelector('.button-reset');
 const btnVisible = document.querySelectorAll('#togglePassword');
-
-const API = `http://localhost:3000/api/reset/${window.location.pathname
-  .split('/')
-  .pop()}`;
+const token = new URLSearchParams(window.location.search).get('token');
+const API = `http://localhost:3000/api/reset/${token}`;
 
 btnReset.addEventListener('click', async (e) => {
   e.preventDefault();
