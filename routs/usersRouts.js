@@ -1,17 +1,9 @@
-const fastify = require('fastify')({ logger: true });
+'use strict';
+
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const User = require('../users/userSchema');
-const path = require('path');
-
-const signToken = (id) => {
-  const token = jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRESIN,
-  });
-  return token;
-};
 
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
@@ -49,8 +41,8 @@ const createUser = async (req, res) => {
     password: strPassword,
     passwordRepeat: strPasswordRepeat,
   });
-  const token = signToken(newUser._id);
-  res.status(201).send({ token, message: 'New user succesfully created' });
+  req.session.userId = newUser._id;
+  res.status(201).send({ message: 'New user succesfully created' });
 };
 
 const checkUser = async (req, res) => {
@@ -67,8 +59,8 @@ const checkUser = async (req, res) => {
     return sendNotFound(res, 'Invalid login or password!');
   }
 
-  const token = signToken(user._id);
-  res.status(200).send({ token, message: 'Successfuly!' });
+  req.session.userId = user._id;
+  res.status(200).send({ message: 'Successfuly!' });
 };
 
 const forgotPassword = async (req, res) => {
@@ -78,8 +70,6 @@ const forgotPassword = async (req, res) => {
     return sendNotFound(res, 'Invalid email!');
   }
   const token = user.createResetToken();
-  console.log('Generated Token:', token);
-  console.log('Hashed Token before saving:', user.passwordResetToken);
   await user.save({ validateBeforeSave: false });
   const resetURL = `http://${req.headers.host}/api/reset/${token}`;
   const message = `${resetURL}`;
@@ -91,11 +81,8 @@ const forgotPassword = async (req, res) => {
   res.status(200).send({
     message: 'Link has benn sent to the client!',
   });
-
-  //   user.passwordResetToken = undefined;
-  //   user.passwordResetExpire = undefined;
-  //   await user.save({ validateBeforeSave: false });
 };
+
 const getResetPage = async (req, res) => {
   const hashedToken = crypto
     .createHash('sha256')
@@ -129,7 +116,7 @@ const resetPassword = async (req, res) => {
   await user.save();
   res.status(200).send({ message: 'Successfuly!' });
 };
-// const router = express.Router();
+
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);

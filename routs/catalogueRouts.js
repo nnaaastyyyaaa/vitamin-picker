@@ -3,12 +3,16 @@
 const fastify = require('fastify')({ logger: true });
 const mongoose = require('mongoose');
 const Vitamin = require('../vitamins/vitamin-schema.js');
+const {
+  replaceTemplate,
+  tempCard,
+  tempOverview,
+} = require('../vitamins/replaceTemplate.js');
 
 const sendErrorRes = (res, message) => {
   return res.status(404).send({ status: 'fail', message });
 };
 
-//get all vitamins
 async function catalogueRouts(fastify, options) {
   const db = options.db;
   const vitamin = Vitamin(db);
@@ -23,7 +27,20 @@ async function catalogueRouts(fastify, options) {
     });
   });
 
-  //get vitamin by id
+  fastify.get('/vitamins/html', async (req, res) => {
+    const vitamins = await vitamin.find();
+    if (!vitamins) {
+      return sendErrorRes(res, 'No vitamins');
+    }
+    const cardsHtml = vitamins
+      .map((el) => replaceTemplate(tempCard, el))
+      .join('');
+
+    const output = tempOverview.replace('{%VITAMIN_CARDS%}', cardsHtml);
+
+    return res.header('Content-Type', 'text/html').send(output);
+  });
+
   fastify.get('/vitamins/:id', async (req, res) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {
@@ -40,7 +57,6 @@ async function catalogueRouts(fastify, options) {
     return { status: 'success', data: { vitamin } };
   });
 
-  //створити новий вітамін
   fastify.post('/vitamins', async (req, res) => {
     const newVitamin = await vitamin.create({
       name: req.body.name,
