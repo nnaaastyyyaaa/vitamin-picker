@@ -2,7 +2,7 @@
 
 const fastify = require('fastify')({ logger: true });
 const mongoose = require('mongoose');
-const vitamin = require('../vitamins/vitamin-schema.js');
+const Vitamin = require('../vitamins/vitamin-schema.js');
 
 const sendErrorRes = (res, message) => {
   return res.status(404).send({ status: 'fail', message });
@@ -10,6 +10,8 @@ const sendErrorRes = (res, message) => {
 
 //get all vitamins
 async function catalogueRouts(fastify, options) {
+  const db = options.db;
+  const vitamin = Vitamin(db);
   fastify.get('/vitamins', async (req, res) => {
     const vitamins = await vitamin.find();
     if (!vitamins) {
@@ -47,7 +49,7 @@ async function catalogueRouts(fastify, options) {
 
     return {
       status: 'success',
-      data: { _id: result.insertedId, newVitamin },
+      data: { newVitamin },
     };
   });
 

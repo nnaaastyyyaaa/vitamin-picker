@@ -18,15 +18,15 @@ const DB1 = process.env.DATABASE1.replace(
   process.env.PASSWORD1,
 );
 mongoose.connect(DB1).then(() => {
-  console.log('DB connection succesful');
+  console.log('DB1 connection succesful');
 });
 
 const DB2 = process.env.DATABASE2.replace(
   '<db_password>',
   process.env.PASSWORD2,
 );
-const db2 = mongoose.createConnection(DB2);
-db2.on('connected', () => console.log('Database2 connected'));
+const db2 = mongoose.createConnection(DB2, { dbName: 'vitamins' });
+db2.on('connected', () => console.log('DB2 connection succesful'));
 
 fastify.register(fStatic, {
   root: path.join(__dirname, 'users'),
