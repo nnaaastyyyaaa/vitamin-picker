@@ -17,10 +17,10 @@ async function catalogueRouts(fastify, options) {
     if (!vitamins) {
       return sendErrorRes(res, 'No vitamins');
     }
-    return {
+    return res.status(200).send({
       status: 'success',
       data: { vitamins },
-    };
+    });
   });
 
   //get vitamin by id
