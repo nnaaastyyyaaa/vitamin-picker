@@ -2,7 +2,6 @@
 
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken');
 const User = require('../users/userSchema');
 
 const sendEmail = async (options) => {
@@ -41,7 +40,9 @@ const createUser = async (req, res) => {
     password: strPassword,
     passwordRepeat: strPasswordRepeat,
   });
+  console.log(newUser);
   req.session.userId = newUser._id;
+  console.log(req.session);
   res.status(201).send({ message: 'New user succesfully created' });
 };
 
@@ -60,6 +61,7 @@ const checkUser = async (req, res) => {
   }
 
   req.session.userId = user._id;
+  console.log(req.session);
   res.status(200).send({ message: 'Successfuly!' });
 };
 

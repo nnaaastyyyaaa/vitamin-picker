@@ -37,11 +37,9 @@ fastify.register(fStatic, {
 fastify.register(cookie);
 fastify.register(session, {
   secret: process.env.SESSION_SECRET,
-  store: new session.MemoryStore(),
   cookieName: 'sessionId',
   cookie: { httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 },
   saveUninitialized: false,
-  resave: false,
 });
 fastify.register(cors, { origin: 'http://127.0.0.1:5500', credentials: true });
 fastify.register(usersRouts, { prefix: '/api' });

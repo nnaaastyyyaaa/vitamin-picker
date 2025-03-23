@@ -16,6 +16,7 @@ signIn.addEventListener('click', async (e) => {
   try {
     const response = await fetch(API, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
