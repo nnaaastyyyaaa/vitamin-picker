@@ -2,7 +2,8 @@
 
 const Fastify = require('fastify');
 const fastify = Fastify({ logger: true });
-const { MongoClient, ObjectId } = require('mongodb');
+const mongoose = require('moongoose');
+// const { MongoClient, ObjectId } = require('mongodb');
 const catalogueRouts = require('../routs/catalogueRouts');
 
 const MONGO_URL =

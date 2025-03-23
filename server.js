@@ -11,12 +11,22 @@ const usersRouts = require('./routs/usersRouts');
 const catalogueRouts = require('./routs/catalogueRouts');
 
 require('./errorHandler')(fastify);
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: './.env' });
 
-const DB = process.env.DATABASE.replace('<db_password>', process.env.PASSWORD);
-mongoose.connect(DB).then(() => {
+const DB1 = process.env.DATABASE1.replace(
+  '<db_password>',
+  process.env.PASSWORD1,
+);
+mongoose.connect(DB1).then(() => {
   console.log('DB connection succesful');
 });
+
+const DB2 = process.env.DATABASE2.replace(
+  '<db_password>',
+  process.env.PASSWORD2,
+);
+const db2 = mongoose.createConnection(DB2);
+db2.on('connected', () => console.log('Database2 connected'));
 
 fastify.register(fStatic, {
   root: path.join(__dirname, 'users'),
@@ -24,7 +34,7 @@ fastify.register(fStatic, {
 
 fastify.register(cors);
 fastify.register(usersRouts, { prefix: '/api' });
-// fastify.register(catalogueRouts, { prefix: '/catalogue' });
+fastify.register(catalogueRouts, { prefix: '/catalogue', db: db2 });
 
 const port = process.env.PORT || 3000;
 fastify.listen({ port, host: '127.0.0.1' }, (err, address) => {
