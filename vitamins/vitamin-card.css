@@ -1,0 +1,61 @@
+.body {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+h3 {
+  color: #a61e4d;
+  font-size: 28px;
+  /* text-decoration: underline; */
+  justify-self: center;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+
+  background-color: #ffdeeb;
+  box-shadow: 0 5px 10px rgb(166, 30, 77, 0.2);
+  border-radius: 30px;
+
+  color: #a61e4d;
+
+  width: 20%;
+  /* height: 400px; */
+  padding: 15px;
+  text-align: center;
+}
+
+.card__link:link {
+  display: flex; /* Додаємо flex-контейнер */
+  align-items: center; /* Вирівнюємо текст по вертикалі */
+  justify-content: center;
+  color: #fff;
+  background-color: #f9a2c2;
+  border-radius: 20px;
+  padding: 15px;
+  text-decoration: none;
+
+  width: 50%;
+  max-width: 70px;
+  height: 3%;
+  margin-top: auto;
+  margin-bottom: 20px;
+  align-self: center;
+}
+
+.card__link:hover,
+.card__link:active,
+.card__link:focus {
+  background-color: #f782ac;
+}

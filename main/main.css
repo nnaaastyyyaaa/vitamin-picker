@@ -5,36 +5,35 @@ body {
   margin: 0;
 }
 
-header {
+#nav-container {
+  background-color: #fff0f5;
   color: hsl(162, 90%, 26%);
   font-weight: 500;
-  margin: 0 5%;
+  gap: 20px;
 
   position: sticky;
   top: 0;
 
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  /* align-items: center; */
+  box-sizing: border-box;
+  padding: 0 15px;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 h1 {
   font-size: 36px;
   font-weight: 700;
-  padding-left: 10px;
 
-  grid-column: 1/4;
   text-align: left;
 
   text-transform: uppercase;
 }
 
-.btn--test:link {
-  grid-column: -2/-3;
-}
-
-.btn--user:link {
-  grid-column: -2/-1;
+.btn--test {
+  margin-left: auto;
 }
 
 .btn--test:link,
@@ -44,7 +43,8 @@ h1 {
   background-color: #88d4bd;
   /* pink4 */
 
-  width: 60%;
+  width: 15%;
+  max-width: 100px;
   height: 45px;
   border-radius: 35px;
 
