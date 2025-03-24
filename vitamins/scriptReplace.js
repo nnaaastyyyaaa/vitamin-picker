@@ -11,7 +11,7 @@ async function getAllVitamins() {
 
     const html = await response.text();
     console.log(html);
-    document.querySelector('.cards-container').innerHTML = html;
+    document.querySelector('.container').innerHTML = html;
     if (!response.ok) {
       throw new Error('Couldn`t load html');
     }
