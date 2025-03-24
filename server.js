@@ -41,7 +41,7 @@ fastify.register(session, {
   cookie: { httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 },
   saveUninitialized: false,
 });
-fastify.register(cors, { credentials: true });
+fastify.register(cors, { origin: 'http://127.0.0.1:5500', credentials: true });
 fastify.register(usersRouts, { prefix: '/api' });
 fastify.register(catalogueRouts, { prefix: '/catalogue', db: db2 });
 

@@ -18,5 +18,4 @@ const tempOverview = fs.readFileSync(
   path.join(__dirname, '/catalogue.html'),
   'utf-8',
 );
-
 module.exports = { replaceTemplate, tempCard, tempOverview };
