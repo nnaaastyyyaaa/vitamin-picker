@@ -26,7 +26,6 @@ signIn.addEventListener('click', async (e) => {
     const jsonResponse = await response.json();
 
     if (response.ok) {
-      localStorage.setItem('token', jsonResponse.token);
       setTimeout(
         () => (window.location.href = '../user-account/user-account-page.html'),
         1000,
