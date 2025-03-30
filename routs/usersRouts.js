@@ -40,9 +40,9 @@ const createUser = async (req, res) => {
     password: strPassword,
     passwordRepeat: strPasswordRepeat,
   });
-  console.log(newUser);
+
   req.session.userId = newUser._id;
-  console.log(req.session);
+  await req.session.save();
   res.status(201).send({ message: 'New user succesfully created' });
 };
 
@@ -61,7 +61,7 @@ const checkUser = async (req, res) => {
   }
 
   req.session.userId = user._id;
-  console.log(req.session);
+  await req.session.save();
   res.status(200).send({ message: 'Successfuly!' });
 };
 
@@ -125,6 +125,13 @@ async function userRoutes(fastify, options) {
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
+  fastify.get('/active-sessions', (req, res) => {
+    if (req.session.userId) {
+      res.send({ message: 'Сесія активна', userId: req.session.userId });
+    } else {
+      res.send({ message: 'Сесія не знайдена' });
+    }
+  });
 }
 
 module.exports = userRoutes;

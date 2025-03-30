@@ -17,7 +17,6 @@ btnCreate.addEventListener('click', async (e) => {
   const username = labelUsername.value;
   const password = labelPassword1.value;
   const password1 = labelPassword2.value;
-  console.log(eMail, username, password, password1);
   try {
     const response = await fetch(API, {
       method: 'POST',
