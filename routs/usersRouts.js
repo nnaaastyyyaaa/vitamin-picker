@@ -65,6 +65,17 @@ const checkUser = async (req, res) => {
   res.status(200).send({ message: 'Successfuly!' });
 };
 
+const getProfile = async (req, res) => {
+  if (!req.session.userId) {
+    return sendNotFound(res, 'You aren`t authorised!');
+  }
+  const user = await User.findById(req.session.userId);
+  if (!user) {
+    return sendNotFound(res, 'Any user found');
+  }
+  res.status(200).send({ name: user.username });
+};
+
 const forgotPassword = async (req, res) => {
   const eMail = req.body.eMail;
   const user = await User.findOne({ eMail: req.body.eMail });
@@ -119,12 +130,31 @@ const resetPassword = async (req, res) => {
   res.status(200).send({ message: 'Successfuly!' });
 };
 
+const deleteUser = async (req, res) => {
+  const { eMail, password } = req.body;
+  if (!eMail || !password) {
+    return sendNotFound(res, 'Please fill both fields');
+  }
+  const strPassword = String(password);
+  const user = await User.findOne({ eMail });
+  if (
+    !user ||
+    !(await user.checkPassword(strPassword, user.password)) ||
+    String(req.session.userId) !== String(user._id)
+  ) {
+    return sendNotFound(res, 'Failed to delete');
+  }
+  await User.findByIdAndDelete(user._id);
+};
+
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);
+  fastify.get('/profile', getProfile);
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
+  fastify.delete('/delete', deleteUser);
   fastify.get('/active-sessions', (req, res) => {
     if (req.session.userId) {
       res.send({ message: 'Сесія активна', userId: req.session.userId });

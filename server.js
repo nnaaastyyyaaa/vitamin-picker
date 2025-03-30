@@ -47,7 +47,11 @@ fastify.register(session, {
   saveUninitialized: false,
   rolling: true,
 });
-fastify.register(cors, { origin: 'http://localhost:5500', credentials: true });
+fastify.register(cors, {
+  origin: 'http://localhost:5500',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+});
 fastify.register(usersRouts, { prefix: '/api' });
 fastify.register(catalogueRouts, { prefix: '/catalogue', db: db2 });
 
