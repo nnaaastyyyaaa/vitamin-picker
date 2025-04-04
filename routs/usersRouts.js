@@ -124,6 +124,7 @@ const resetPassword = async (req, res) => {
   }
   user.password = strPassword;
   user.passwordRepeat = strPassword1;
+  user.resetAttempts = 0;
   user.passwordResetToken = undefined;
   user.passwordResetExpire = undefined;
   await user.save();
@@ -155,13 +156,6 @@ async function userRoutes(fastify, options) {
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
   fastify.delete('/delete', deleteUser);
-  fastify.get('/active-sessions', (req, res) => {
-    if (req.session.userId) {
-      res.send({ message: 'Сесія активна', userId: req.session.userId });
-    } else {
-      res.send({ message: 'Сесія не знайдена' });
-    }
-  });
 }
 
 module.exports = userRoutes;

@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpire: Date,
+  resetAttempts: {
+    type: Number,
+    default: 0,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -48,15 +52,26 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.checkPassword = async function (inputPassword, dbPassword) {
   return await bcrypt.compare(inputPassword, dbPassword);
 };
-
+function* tokenGenerator() {
+  yield crypto.randomBytes(32).toString('hex');
+}
 userSchema.methods.createResetToken = function () {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(token)
-    .digest('hex');
-  this.passwordResetExpire = Date.now() + 15 * 60 * 1000;
-  return token;
+  if (this.passwordResetExpire && this.passwordResetExpire < Date.now()) {
+    this.resetAttempts = 0;
+  }
+  if (this.resetAttempts >= 3) {
+    throw new Error('You have used your attempts.Please, try again later!');
+  } else {
+    const genToken = tokenGenerator();
+    const { value: token } = genToken.next();
+    this.passwordResetToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+    this.passwordResetExpire = Date.now() + 30 * 60 * 1000;
+    this.resetAttempts++;
+    return token;
+  }
 };
 
 const User = mongoose.model('User', userSchema);
