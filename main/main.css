@@ -69,6 +69,6 @@ h1 {
 .btn--test:active,
 .btn--user:hover,
 .btn--user:active {
-  box-shadow: 0 5px 10px rgb(12, 133, 153, 0.5);
+  border: solid 2px #077f5b;
   transition: box-shadow 0.3s ease;
 }

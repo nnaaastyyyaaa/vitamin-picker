@@ -1,0 +1,17 @@
+.test-box {
+  display: grid;
+  margin: 30px;
+  border-radius: 30px;
+  padding: 20px;
+  background-color: #ffdeeb;
+}
+
+h2 {
+  color: #a61e4d;
+  justify-self: center;
+}
+
+.test-form {
+  display: grid;
+  background-color: #f9a2c2;
+}

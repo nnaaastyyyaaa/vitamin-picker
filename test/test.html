@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../main/main.css" />
+    <script src="../main/main.js" defer></script>
+    <title>Test</title>
+    <script src="/test/test-script.js"></script>
+    <link rel="stylesheet" href="test.css" />
+  </head>
+  <body>
+    <div id="nav-container"></div>
+
+    <div class="test-box">
+      <h2>Select the symptoms You experienced</h2>
+      <form id="test-form">
+        <label
+          ><input type="checkbox" name="symptom" value="fatigue" /> Feeling
+          constantly fatigue</label
+        ><br />
+        <label
+          ><input type="checkbox" name="symptom" value="brittle_nails" />
+          Brittle nails</label
+        ><br />
+        <label
+          ><input type="checkbox" name="symptom" value="dry_skin" /> Dry
+          skin</label
+        ><br />
+        <label
+          ><input type="checkbox" name="symptom" value="hair_loss" /> Hair
+          loss</label
+        ><br />
+        <button type="button" onclick="submitTest()">Get results</button>
+      </form>
+      <h3>Recomendations:</h3>
+      <p id="result"></p>
+    </div>
+  </body>
+</html>
