@@ -32,8 +32,13 @@ db2.on('connected', () => console.log('DB2 connection succesful'));
 
 fastify.register(fStatic, {
   root: path.join(__dirname, 'users'),
+  prefix: '/users/',
 });
-
+fastify.register(fStatic, {
+  root: path.join(__dirname, 'vitamins'),
+  prefix: '/vitamins/',
+  decorateReply: false,
+});
 fastify.register(cookie);
 fastify.register(session, {
   secret: process.env.SESSION_SECRET,

@@ -4,6 +4,45 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../users/userSchema');
 
+const memoize = (fn) => {
+  const ttl = 5 * 60 * 1000;
+  const cache = new Map();
+
+  const deleteFromCache = (...args) => {
+    const key = args.map((arg) => String(arg)).join('|');
+    cache.delete(key);
+  };
+
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, { timestamp }] of cache) {
+      if (timestamp < now) {
+        cache.delete(key);
+      }
+    }
+  }, 200000);
+  const memoized = async (...args) => {
+    const now = Date.now();
+    const key = args.map((arg) => String(arg)).join('|');
+    const cached = cache.get(key);
+    if (cached && cached.timestamp > now) {
+      console.log('Hello from cache');
+      console.log(cache);
+      return cached.value;
+    }
+
+    const val = await fn(...args);
+    cache.set(key, {
+      value: val,
+      timestamp: now + ttl,
+    });
+    return val;
+  };
+  memoized.deleteFromCache = deleteFromCache;
+  return memoized;
+};
+
+const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -53,7 +92,7 @@ const checkUser = async (req, res) => {
     return sendNotFound(res, 'Please fill both fields');
   }
 
-  const user = await User.findOne({ eMail: login });
+  const user = await memoizedFindUser(login);
   const strPassword = String(password);
 
   if (!user || !(await user.checkPassword(strPassword, user.password))) {
@@ -78,7 +117,7 @@ const getProfile = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   const eMail = req.body.eMail;
-  const user = await User.findOne({ eMail: req.body.eMail });
+  const user = await memoizedFindUser(eMail);
   if (!user) {
     return sendNotFound(res, 'Invalid email!');
   }
@@ -108,6 +147,7 @@ const getResetPage = async (req, res) => {
   if (!user) {
     return sendNotFound(res, 'Didn`t find user or your token has expired!');
   }
+  memoizedFindUser.deleteFromCache(user.eMail);
   res.redirect(`/user-reset/reset-password.html?token=${req.params.token}`);
 };
 
@@ -130,6 +170,20 @@ const resetPassword = async (req, res) => {
   await user.save();
   res.status(200).send({ message: 'Successfuly!' });
 };
+const logOut = async (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      throw new Error('Failed to logout!');
+    }
+    res.clearCookie('sessionId', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+      maxAge: 1000 * 60 * 60,
+    });
+    res.send({ message: 'Logged out' });
+  });
+};
 
 const deleteUser = async (req, res) => {
   const { eMail, password } = req.body;
@@ -137,7 +191,7 @@ const deleteUser = async (req, res) => {
     return sendNotFound(res, 'Please fill both fields');
   }
   const strPassword = String(password);
-  const user = await User.findOne({ eMail });
+  const user = await memoizedFindUser(login);
   if (
     !user ||
     !(await user.checkPassword(strPassword, user.password)) ||
@@ -155,6 +209,7 @@ async function userRoutes(fastify, options) {
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
+  fastify.get('/exit', logOut);
   fastify.delete('/delete', deleteUser);
 }
 
