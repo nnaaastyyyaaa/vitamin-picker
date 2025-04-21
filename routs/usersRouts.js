@@ -200,6 +200,7 @@ const deleteUser = async (req, res) => {
     return sendNotFound(res, 'Failed to delete');
   }
   await User.findByIdAndDelete(user._id);
+  memoizedFindUser.deleteFromCache(user.eMail);
 };
 
 async function userRoutes(fastify, options) {
