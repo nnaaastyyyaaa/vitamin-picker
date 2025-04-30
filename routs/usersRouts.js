@@ -13,14 +13,6 @@ const memoize = (fn) => {
     cache.delete(key);
   };
 
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, { timestamp }] of cache) {
-      if (timestamp < now) {
-        cache.delete(key);
-      }
-    }
-  }, 200000);
   const memoized = async (...args) => {
     const now = Date.now();
     const key = args.map((arg) => String(arg)).join('|');
@@ -36,6 +28,11 @@ const memoize = (fn) => {
       value: val,
       timestamp: now + ttl,
     });
+    for (const [key, { timestamp }] of cache) {
+      if (timestamp < now) {
+        cache.delete(key);
+      }
+    }
     return val;
   };
   memoized.deleteFromCache = deleteFromCache;
@@ -43,6 +40,40 @@ const memoize = (fn) => {
 };
 
 const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
+
+const sendResponse = (res, message, status = 200) => {
+  res.status(status).send({ message });
+};
+
+const throwError = (status, message) => {
+  const error = new Error(message);
+  error.statusCode = status;
+  throw error;
+};
+
+const createSession = async (req, user) => {
+  req.session.userId = user._id;
+  await req.session.save();
+};
+
+const deleteSession = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      throwError(null, 'Failed to logout!');
+    }
+    res.clearCookie('sessionId', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+      maxAge: 1000 * 60 * 60,
+    });
+  });
+};
+
+const hashToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
+
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -65,10 +96,6 @@ const sendEmail = async (options) => {
   await transporter.sendMail(mailOp);
 };
 
-const sendNotFound = (res, message) => {
-  return res.status(404).send({ message: message });
-};
-
 const createUser = async (req, res) => {
   const { username, eMail, password, passwordRepeat } = req.body;
   const strPassword = String(password);
@@ -79,38 +106,35 @@ const createUser = async (req, res) => {
     password: strPassword,
     passwordRepeat: strPasswordRepeat,
   });
-
-  req.session.userId = newUser._id;
-  await req.session.save();
-  res.status(201).send({ message: 'New user succesfully created' });
+  await createSession(req, newUser);
+  sendResponse(res, 'New user succesfully created', 201);
 };
 
 const checkUser = async (req, res) => {
   const { login, password } = req.body;
 
   if (!login || !password) {
-    return sendNotFound(res, 'Please fill both fields');
+    throwError(400, 'Please fill both fields');
   }
 
   const user = await memoizedFindUser(login);
   const strPassword = String(password);
 
   if (!user || !(await user.checkPassword(strPassword, user.password))) {
-    return sendNotFound(res, 'Invalid login or password!');
+    throwError(401, 'Invalid login or password!');
   }
 
-  req.session.userId = user._id;
-  await req.session.save();
-  res.status(200).send({ message: 'Successfuly!' });
+  await createSession(req, user);
+  sendResponse(res, 'Successfuly!');
 };
 
 const getProfile = async (req, res) => {
   if (!req.session.userId) {
-    return sendNotFound(res, 'You aren`t authorised!');
+    throwError(403, 'You aren`t authorised!');
   }
   const user = await User.findById(req.session.userId);
   if (!user) {
-    return sendNotFound(res, 'Any user found');
+    throwError(401, 'Any user found');
   }
   res.status(200).send({ name: user.username });
 };
@@ -119,7 +143,7 @@ const forgotPassword = async (req, res) => {
   const eMail = req.body.eMail;
   const user = await memoizedFindUser(eMail);
   if (!user) {
-    return sendNotFound(res, 'Invalid email!');
+    throwError(401, 'Invalid email!');
   }
   const token = user.createResetToken();
   await user.save({ validateBeforeSave: false });
@@ -130,22 +154,18 @@ const forgotPassword = async (req, res) => {
     subject: 'Your password reset link',
     message,
   });
-  res.status(200).send({
-    message: 'Link has benn sent to the client!',
-  });
+  sendResponse(res, 'Link has been sent to the client!');
 };
 
 const getResetPage = async (req, res) => {
-  const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
+  const token = req.params.token;
+  const hashedToken = hashToken(token);
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpire: { $gt: Date.now() },
   });
   if (!user) {
-    return sendNotFound(res, 'Didn`t find user or your token has expired!');
+    return throwError(401, 'Didn`t find user or your token has expired!');
   }
   memoizedFindUser.deleteFromCache(user.eMail);
   res.redirect(`/user-reset/reset-password.html?token=${req.params.token}`);
@@ -153,14 +173,13 @@ const getResetPage = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   const token = req.params.token;
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-  console.log(hashedToken);
+  const hashedToken = hashToken(token);
   const { password, password1 } = req.body;
   const strPassword = String(password);
   const strPassword1 = String(password1);
   const user = await User.findOne({ passwordResetToken: hashedToken });
   if (!user) {
-    return sendNotFound(res, 'Any user found ');
+    throwError(401, 'Any user found ');
   }
   user.password = strPassword;
   user.passwordRepeat = strPassword1;
@@ -168,37 +187,29 @@ const resetPassword = async (req, res) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpire = undefined;
   await user.save();
-  res.status(200).send({ message: 'Successfuly!' });
+  sendResponse(res, 'Successfuly!');
 };
+
 const logOut = async (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      throw new Error('Failed to logout!');
-    }
-    res.clearCookie('sessionId', {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'Lax',
-      maxAge: 1000 * 60 * 60,
-    });
-    res.send({ message: 'Logged out' });
-  });
+  deleteSession(req, res);
+  sendResponse(res, 'Logged out');
 };
 
 const deleteUser = async (req, res) => {
   const { eMail, password } = req.body;
   if (!eMail || !password) {
-    return sendNotFound(res, 'Please fill both fields');
+    throwError(400, 'Please fill both fields');
   }
   const strPassword = String(password);
-  const user = await memoizedFindUser(login);
+  const user = await memoizedFindUser(eMail);
   if (
     !user ||
     !(await user.checkPassword(strPassword, user.password)) ||
     String(req.session.userId) !== String(user._id)
   ) {
-    return sendNotFound(res, 'Failed to delete');
+    throwError(400, 'Failed to delete');
   }
+  deleteSession(req, res);
   await User.findByIdAndDelete(user._id);
   memoizedFindUser.deleteFromCache(user.eMail);
 };

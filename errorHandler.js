@@ -15,4 +15,8 @@ module.exports = function (fastify) {
       .status(error.statusCode || 500)
       .send({ message: error.message || 'Something went wrong' });
   });
+
+  fastify.setNotFoundHandler((request, reply) => {
+    reply.status(404).send({ message: 'Didn`t find needed resourse!' });
+  });
 };
