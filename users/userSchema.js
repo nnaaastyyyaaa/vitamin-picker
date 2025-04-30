@@ -52,9 +52,14 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.checkPassword = async function (inputPassword, dbPassword) {
   return await bcrypt.compare(inputPassword, dbPassword);
 };
+
 function* tokenGenerator() {
-  yield crypto.randomBytes(32).toString('hex');
+  while (true) {
+    yield crypto.randomBytes(32).toString('hex');
+  }
 }
+const genToken = tokenGenerator();
+
 userSchema.methods.createResetToken = function () {
   if (this.passwordResetExpire && this.passwordResetExpire < Date.now()) {
     this.resetAttempts = 0;
@@ -62,7 +67,6 @@ userSchema.methods.createResetToken = function () {
   if (this.resetAttempts >= 3) {
     throw new Error('You have used your attempts.Please, try again later!');
   } else {
-    const genToken = tokenGenerator();
     const { value: token } = genToken.next();
     this.passwordResetToken = crypto
       .createHash('sha256')
