@@ -3,7 +3,7 @@
 const labelLogin = document.querySelector('.login');
 const labelPassword = document.querySelector('.password');
 const labelMessage = document.querySelector('.message1');
-const deleteBtn = document.querySelector('.delete--btn');
+const deleteBtn = document.querySelector('.main--btn');
 const API = 'http://localhost:3000/api/delete';
 
 deleteBtn.addEventListener('click', async (e) => {
