@@ -136,7 +136,7 @@ const getProfile = async (req, res) => {
   if (!user) {
     throwError(401, 'Any user found');
   }
-  res.status(200).send({ name: user.username });
+  res.status(200).send({ name: user.username, role: user.role });
 };
 
 const forgotPassword = async (req, res) => {
@@ -168,7 +168,9 @@ const getResetPage = async (req, res) => {
     return throwError(401, 'Didn`t find user or your token has expired!');
   }
   memoizedFindUser.deleteFromCache(user.eMail);
-  res.redirect(`/user-reset/reset-password.html?token=${req.params.token}`);
+  res.redirect(
+    `/users/user-reset/reset-password.html?token=${req.params.token}`,
+  );
 };
 
 const resetPassword = async (req, res) => {
@@ -214,6 +216,29 @@ const deleteUser = async (req, res) => {
   memoizedFindUser.deleteFromCache(user.eMail);
 };
 
+const getAllUsers = async (req, res) => {
+  const user = await User.findById(req.session.userId);
+  if (!user || user.role !== 'admin') {
+    return throwError(403, 'You aren`t allowed to do this request!');
+  }
+
+  res.raw.writeHead(200, { 'Content-Type': 'application/json' });
+  const cursor = User.find({}, 'username eMail createdAt -_id').cursor();
+
+  cursor.on('data', (data) => {
+    const dataJson = JSON.stringify(data);
+    res.raw.write(dataJson + '\n');
+  });
+
+  cursor.on('end', () => {
+    res.raw.end();
+  });
+
+  cursor.on('error', (err) => {
+    throwError(null, 'Error while streaming users');
+  });
+};
+
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);
@@ -223,6 +248,7 @@ async function userRoutes(fastify, options) {
   fastify.get('/reset/:token', getResetPage);
   fastify.get('/exit', logOut);
   fastify.delete('/delete', deleteUser);
+  fastify.get('/getAllUsers', getAllUsers);
 }
 
 module.exports = userRoutes;

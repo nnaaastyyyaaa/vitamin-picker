@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
   password: {
     type: String,
     required: [true, 'Profile must have a password'],
@@ -30,6 +35,10 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Passwords aren`t the same',
     },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
   passwordChangedAt: Date,
   passwordResetToken: String,

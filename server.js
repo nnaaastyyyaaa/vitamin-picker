@@ -32,7 +32,7 @@ db2.on('connected', () => console.log('DB2 connection succesful'));
 
 fastify.register(fStatic, {
   root: path.join(__dirname, 'users'),
-  prefix: '/',
+  prefix: '/users/',
   decorateReply: false,
 });
 fastify.register(fStatic, {

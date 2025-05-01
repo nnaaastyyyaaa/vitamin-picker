@@ -6,7 +6,20 @@
   </head>
   <body>
     <h1 class="title"></h1>
-    <button type="button" class="exit--btn" class="link">Exit</button></br>
+
+    <button type="button" class="users--btn" class="link" style = 'display: none;'>Get list of all users</button></br>
+    <button type="button" class="close--btn" class="link" style = 'display: none;'>Close table</button></br>
+    <table class="users--table" style = 'display: none;border-collapse: collapse; margin-top: 20px;'>
+      <thead>
+        <tr>
+          <th style="border: 1px solid #000; padding: 5px;">Username</th>
+          <th style="border: 1px solid #000; padding: 5px;">Email</th>
+          <th style="border: 1px solid #000; padding: 5px;">Created At</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button type="button" class="exit--btn" class="link" >Exit</button></br>
     <p class="message1"></p>
     <a href="../user-delete/user-delete.html" class="delete--link"
       >Delete my account</a
