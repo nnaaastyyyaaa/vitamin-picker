@@ -1,7 +1,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+
+const axios = require('axios');
 const User = require('../users/userSchema');
 
 const memoize = (fn) => {
@@ -59,7 +60,7 @@ const createSession = async (req, user) => {
 const deleteSession = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      throwError(null, 'Failed to logout!');
+      throwError(500, 'Failed to logout!');
     }
     res.clearCookie('sessionId', {
       httpOnly: true,
@@ -72,28 +73,6 @@ const deleteSession = (req, res) => {
 
 const hashToken = (token) => {
   return crypto.createHash('sha256').update(token).digest('hex');
-};
-
-const sendEmail = async (options) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  const mailOp = {
-    from: 'Nastya',
-    to: options.email,
-    subject: options.subject,
-    html: `<p>Forgot a password? Click the link below to reset it:</p>
-    <a href="${options.message}" target="_blank">${options.message}</a>
-    <p>If you didn't request a password reset, please ignore this email.</p>`,
-  };
-
-  await transporter.sendMail(mailOp);
 };
 
 const createUser = async (req, res) => {
@@ -149,12 +128,32 @@ const forgotPassword = async (req, res) => {
   await user.save({ validateBeforeSave: false });
   const resetURL = `http://${req.headers.host}/api/reset/${token}`;
   const message = `${resetURL}`;
-  await sendEmail({
-    email: eMail,
-    subject: 'Your password reset link',
-    message,
-  });
-  sendResponse(res, 'Link has been sent to the client!');
+
+  const authHeader =
+    'Basic ' + Buffer.from(`api:${process.env.MAILGUN_KEY}`).toString('base64');
+
+  const response = await axios.post(
+    `https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`,
+    new URLSearchParams({
+      from: `Anastasia <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+      to: eMail,
+      subject: 'Your password reset link',
+      html: `<p>Forgot a password? Click the link below to reset it:</p>
+      <a href="${message}" target="_blank">${message}</a>
+      <p>If you didn't request a password reset, please ignore this email.</p>`,
+    }),
+    {
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    },
+  );
+
+  if (!response.status === 200) {
+    throwError(500, 'Failed to send link');
+  }
+  sendResponse(res, 'Link has been sent to the client');
 };
 
 const getResetPage = async (req, res) => {
@@ -235,7 +234,7 @@ const getAllUsers = async (req, res) => {
   });
 
   cursor.on('error', (err) => {
-    throwError(null, 'Error while streaming users');
+    throwError(500, 'Error while streaming users');
   });
 };
 
