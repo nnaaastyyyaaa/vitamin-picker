@@ -221,7 +221,11 @@ const getAllUsers = async (req, res) => {
     return throwError(403, 'You aren`t allowed to do this request!');
   }
 
-  res.raw.writeHead(200, { 'Content-Type': 'application/json' });
+  res.raw.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': 'http://localhost:5500',
+    'Access-Control-Allow-Credentials': 'true',
+  });
   const cursor = User.find({}, 'username eMail createdAt -_id').cursor();
 
   cursor.on('data', (data) => {
