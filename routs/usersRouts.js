@@ -4,6 +4,9 @@ const crypto = require('crypto');
 
 const axios = require('axios');
 const User = require('../users/userSchema');
+const { throwError } = require('../throwError');
+const { authProxy } = require('../users/proxies');
+const { apiProxy } = require('../users/proxies');
 
 const memoize = (fn) => {
   const ttl = 5 * 60 * 1000;
@@ -44,12 +47,6 @@ const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
 
 const sendResponse = (res, message, status = 200) => {
   res.status(status).send({ message });
-};
-
-const throwError = (status, message) => {
-  const error = new Error(message);
-  error.statusCode = status;
-  throw error;
 };
 
 const createSession = async (req, user) => {
@@ -108,14 +105,20 @@ const checkUser = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  if (!req.session.userId) {
-    throwError(403, 'You aren`t authorised!');
-  }
-  const user = await User.findById(req.session.userId);
-  if (!user) {
-    throwError(401, 'Any user found');
-  }
+  const user = req.user;
   res.status(200).send({ name: user.username, role: user.role });
+};
+
+const getEmail = async (eMail, message) => {
+  const response = apiProxy({
+    from: `Anastasia <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+    to: eMail,
+    subject: 'Your password reset link',
+    html: `<p>Forgot a password? Click the link below to reset it:</p>
+      <a href="${message}" target="_blank">${message}</a>
+      <p>If you didn't request a password reset, please ignore this email.</p>`,
+  });
+  return response;
 };
 
 const forgotPassword = async (req, res) => {
@@ -129,31 +132,11 @@ const forgotPassword = async (req, res) => {
   const resetURL = `http://${req.headers.host}/api/reset/${token}`;
   const message = `${resetURL}`;
 
-  const authHeader =
-    'Basic ' + Buffer.from(`api:${process.env.MAILGUN_KEY}`).toString('base64');
-
-  const response = await axios.post(
-    `https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`,
-    new URLSearchParams({
-      from: `Anastasia <postmaster@${process.env.MAILGUN_DOMAIN}>`,
-      to: eMail,
-      subject: 'Your password reset link',
-      html: `<p>Forgot a password? Click the link below to reset it:</p>
-      <a href="${message}" target="_blank">${message}</a>
-      <p>If you didn't request a password reset, please ignore this email.</p>`,
-    }),
-    {
-      headers: {
-        Authorization: authHeader,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    },
-  );
-
+  const response = await getEmail(eMail, message);
   if (!response.status === 200) {
-    throwError(500, 'Failed to send link');
+    throwError(500, response.message);
   }
-  sendResponse(res, 'Link has been sent to the client');
+  sendResponse(res, 'Link has been sent to this email');
 };
 
 const getResetPage = async (req, res) => {
@@ -206,7 +189,7 @@ const deleteUser = async (req, res) => {
   if (
     !user ||
     !(await user.checkPassword(strPassword, user.password)) ||
-    String(req.session.userId) !== String(user._id)
+    req.user !== user
   ) {
     throwError(400, 'Failed to delete');
   }
@@ -216,11 +199,6 @@ const deleteUser = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  const user = await User.findById(req.session.userId);
-  if (!user || user.role !== 'admin') {
-    return throwError(403, 'You aren`t allowed to do this request!');
-  }
-
   res.raw.writeHead(200, {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': 'http://localhost:5500',
@@ -245,13 +223,17 @@ const getAllUsers = async (req, res) => {
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);
-  fastify.get('/profile', getProfile);
+  fastify.get('/profile', { preHandler: [authProxy()] }, getProfile);
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
-  fastify.get('/exit', logOut);
-  fastify.delete('/delete', deleteUser);
-  fastify.get('/getAllUsers', getAllUsers);
+  fastify.get('/exit', { preHandler: [authProxy()] }, logOut);
+  fastify.delete('/delete', { preHandler: [authProxy()] }, deleteUser);
+  fastify.get(
+    '/getAllUsers',
+    { preHandler: [authProxy('admin')] },
+    getAllUsers,
+  );
 }
 
 module.exports = userRoutes;
