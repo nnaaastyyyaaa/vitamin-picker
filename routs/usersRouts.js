@@ -1,48 +1,10 @@
 'use strict';
 
 const crypto = require('crypto');
-
-const axios = require('axios');
 const User = require('../users/userSchema');
-const { throwError } = require('../throwError');
-const { authProxy } = require('../users/proxies');
-const { apiProxy } = require('../users/proxies');
-
-const memoize = (fn) => {
-  const ttl = 5 * 60 * 1000;
-  const cache = new Map();
-
-  const deleteFromCache = (...args) => {
-    const key = args.map((arg) => String(arg)).join('|');
-    cache.delete(key);
-  };
-
-  const memoized = async (...args) => {
-    const now = Date.now();
-    const key = args.map((arg) => String(arg)).join('|');
-    const cached = cache.get(key);
-    if (cached && cached.timestamp > now) {
-      console.log('Hello from cache');
-      console.log(cache);
-      return cached.value;
-    }
-
-    const val = await fn(...args);
-    cache.set(key, {
-      value: val,
-      timestamp: now + ttl,
-    });
-    for (const [key, { timestamp }] of cache) {
-      if (timestamp < now) {
-        cache.delete(key);
-      }
-    }
-    return val;
-  };
-  memoized.deleteFromCache = deleteFromCache;
-  return memoized;
-};
-
+const { memoize } = require('../users/tools/memoization');
+const { throwError } = require('../users/tools/throwError');
+const { apiProxy } = require('../users/tools/apiProxy');
 const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
 
 const sendResponse = (res, message, status = 200) => {
@@ -66,6 +28,22 @@ const deleteSession = (req, res) => {
       maxAge: 1000 * 60 * 60,
     });
   });
+};
+
+const checkSession = (requiredRole = null) => {
+  return async function (req, res) {
+    if (!req.session.userId) {
+      throwError(403, 'You aren`t authorised!');
+    }
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      throwError(401, 'Any user found');
+    }
+    if (requiredRole && user.role !== requiredRole) {
+      throwError(403, 'You aren`t allowed to do this request!');
+    }
+    req.user = user;
+  };
 };
 
 const hashToken = (token) => {
@@ -223,15 +201,15 @@ const getAllUsers = async (req, res) => {
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);
-  fastify.get('/profile', { preHandler: [authProxy()] }, getProfile);
+  fastify.get('/profile', { preHandler: [checkSession()] }, getProfile);
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
-  fastify.get('/exit', { preHandler: [authProxy()] }, logOut);
-  fastify.delete('/delete', { preHandler: [authProxy()] }, deleteUser);
+  fastify.get('/exit', { preHandler: [checkSession()] }, logOut);
+  fastify.delete('/delete', { preHandler: [checkSession()] }, deleteUser);
   fastify.get(
     '/getAllUsers',
-    { preHandler: [authProxy('admin')] },
+    { preHandler: [checkSession('admin')] },
     getAllUsers,
   );
 }
