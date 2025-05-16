@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const User = require('../users/userSchema');
 const { memoize } = require('../users/tools/memoization');
 const { throwError } = require('../users/tools/throwError');
-const { apiProxy } = require('../users/tools/apiProxy');
+const { sendEmail } = require('../users/tools/apiProxy');
 const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
 
 const sendResponse = (res, message, status = 200) => {
@@ -87,9 +87,8 @@ const getProfile = async (req, res) => {
   res.status(200).send({ name: user.username, role: user.role });
 };
 
-const getEmail = async (eMail, message) => {
-  const response = apiProxy({
-    from: `Anastasia <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+const getEmail = (eMail, message) => {
+  const response = sendEmail({
     to: eMail,
     subject: 'Your password reset link',
     html: `<p>Forgot a password? Click the link below to reset it:</p>
@@ -110,7 +109,7 @@ const forgotPassword = async (req, res) => {
   const resetURL = `http://${req.headers.host}/api/reset/${token}`;
   const message = `${resetURL}`;
 
-  const response = await getEmail(eMail, message);
+  const response =  getEmail(eMail, message);
   if (!response.status === 200) {
     throwError(500, response.message);
   }
