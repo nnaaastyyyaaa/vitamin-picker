@@ -13,6 +13,7 @@
     <script src="../main/main.js" defer></script>
     <title>Test</title>
     <script src="/test/test-script.js"></script>
+    <script src="/test/symptom-loader.js" defer></script>
     <link rel="stylesheet" href="test.css" />
   </head>
   <body>
@@ -21,22 +22,7 @@
     <div class="test-box">
       <h2>Select the symptoms You experienced</h2>
       <form id="test-form">
-        <label
-          ><input type="checkbox" name="symptom" value="fatigue" /> Feeling
-          constantly fatigue</label
-        ><br />
-        <label
-          ><input type="checkbox" name="symptom" value="brittle_nails" />
-          Brittle nails</label
-        ><br />
-        <label
-          ><input type="checkbox" name="symptom" value="dry_skin" /> Dry
-          skin</label
-        ><br />
-        <label
-          ><input type="checkbox" name="symptom" value="hair_loss" /> Hair
-          loss</label
-        ><br />
+        <div id="symptom-list"></div>
         <button type="button" onclick="submitTest()">Get results</button>
       </form>
       <h3>Recomendations:</h3>

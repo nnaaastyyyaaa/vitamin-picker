@@ -1,4 +1,4 @@
-'use srtict';
+'use strict';
 
 const fastify = require('fastify')({ logger: true });
 const mongoose = require('mongoose');
@@ -21,11 +21,10 @@ const renderSymptomList = (symptoms) => {
     )
     .join('');
 
-  ///rename
   return tempOverview.replace('{%SYMPTOM_LIST%}', listItems);
 };
 
-async function testRouts(fastify, options) {
+async function testRoutes(fastify, options) {
   const db = options.db;
   const symptomSchema = symptom(db);
   const VitaminSchema = Vitamin(db);
@@ -46,10 +45,43 @@ async function testRouts(fastify, options) {
       : sendErrorRes(res, 'No syptoms found');
   });
 
-  fastify.post('/analyze', async(req, res)=>{
-    const {symptoms}=req.body;
-    if(!symptoms?.length) return sendErrorRes(res,'No syptoms provided' );
+  fastify.post('/analyze', async (req, res) => {
+    const { symptoms } = req.body;
 
-    const symptom
-  })
+    if (!Array.isArray(symptoms) || symptoms.length === 0) {
+      return sendErrorRes(res, 'No symptoms provided');
+    }
+
+    const foundSymptoms = await symptomSchema.find({ _id: { $in: symptoms } });
+
+    if (!foundSymptoms.length) {
+      return sendErrorRes(res, 'Symptoms not found in database');
+    }
+
+    const vitaminIds = [
+      ...new Set(
+        foundSymptoms.flatMap((sym) =>
+          sym.related_vitamins.map((id) => id.toString()),
+        ),
+      ),
+    ];
+
+    if (!vitaminIds.length) {
+      return res.status(200).send({
+        status: 'success',
+        message: 'No vitamins found for the given symptoms',
+        data: [],
+      });
+    }
+  });
+
+  const vitamins = await VitaminSchema.find({ _id: { $in: vitaminIds } });
+
+  return res.status(200).send({
+    status: 'success',
+    message: 'Recomended vitamins',
+    data: vitamins,
+  });
 }
+
+module.exports = testRoutes;

@@ -11,6 +11,7 @@ const session = require('@fastify/session');
 
 const usersRouts = require('./routs/usersRouts');
 const catalogueRouts = require('./routs/catalogueRouts');
+const testRouts = require('./routs/testRouts');
 
 require('./errorHandler')(fastify);
 dotenv.config({ path: './.env' });
@@ -66,6 +67,7 @@ fastify.register(cors, {
 });
 fastify.register(usersRouts, { prefix: '/api' });
 fastify.register(catalogueRouts, { prefix: '/catalogue', db: db2 });
+fastify.register(testRouts, { prefix: '/test', db: db2 });
 
 const port = process.env.PORT || 3000;
 fastify.listen({ port, host: '127.0.0.1' }, (err, address) => {
