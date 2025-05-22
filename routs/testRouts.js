@@ -26,7 +26,7 @@ const renderSymptomList = (symptoms) => {
 
 async function testRoutes(fastify, options) {
   const db = options.db;
-  const symptomSchema = symptom(db);
+  const symptomSchema = Symptom(db);
   const VitaminSchema = Vitamin(db);
 
   fastify.get('/symptoms', async (req, res) => {
@@ -73,14 +73,14 @@ async function testRoutes(fastify, options) {
         data: [],
       });
     }
-  });
 
-  const vitamins = await VitaminSchema.find({ _id: { $in: vitaminIds } });
+      const vitamins = await VitaminSchema.find({ _id: { $in: vitaminIds } });
 
   return res.status(200).send({
     status: 'success',
     message: 'Recomended vitamins',
     data: vitamins,
+  });
   });
 }
 

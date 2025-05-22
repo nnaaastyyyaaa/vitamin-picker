@@ -46,7 +46,11 @@ fastify.register(fStatic, {
   prefix: '/main/',
   decorateReply: false,
 });
-
+fastify.register(fStatic, {
+  root: path.join(__dirname, 'test'),
+  prefix: '/test/',
+  decorateReply: false,
+});
 fastify.register(cookie);
 fastify.register(session, {
   secret: process.env.SESSION_SECRET,

@@ -8,5 +8,5 @@ module.exports = (db) => {
     description: { type: String, default: '' },
   });
 
-  return db.model('Vitamin', VitaminSchema);
+  return db.models.Vitamin ?? db.model('Vitamin', VitaminSchema);
 };
