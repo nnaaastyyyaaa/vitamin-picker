@@ -12,7 +12,6 @@ async function submitTest() {
   const result = await response.json();
   console.log(result);
 
-  const titleEl = document.getElementById('recommendation-title');
   const resultEl = document.getElementById('result');
 
   if (
@@ -21,10 +20,8 @@ async function submitTest() {
     result.data.length > 0
   ) {
     const vitaminNames = result.data.map((v) => v.name).join(', ');
-    resultEl.innerText = `Recommended vitamins: ${vitaminNames}`;
-    titleEl.style.display = 'block'; // Показуємо заголовок
+    resultEl.innerHTML = `<h3> Recommended vitamins: </h3> <p> ${vitaminNames} </p>`;
   } else {
     resultEl.innerText = result.message || 'No recommendations found.';
-    titleEl.style.display = 'block';
   }
 }
