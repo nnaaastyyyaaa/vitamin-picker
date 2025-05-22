@@ -1,7 +1,13 @@
 'use strict';
 
 async function loadSymptoms() {
-  const res = await fetch('/symptoms');
+  const res = await fetch('http://localhost:3000/test/symptoms', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
   const data = await res.json();
 
   if (data.status !== 'success') {
