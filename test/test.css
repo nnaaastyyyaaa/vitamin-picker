@@ -1,17 +1,103 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #ffe6f0;
+  /* display: grid; */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
 .test-box {
   display: grid;
   margin: 30px;
   border-radius: 30px;
-  padding: 20px;
+  padding: 30px;
   background-color: #ffdeeb;
+  min-width: 250px;
+  max-width: 700px;
+  margin: 30px auto;
+  width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  justify-items: center;
+  text-align: center;
 }
 
 h2 {
   color: #a61e4d;
-  justify-self: center;
+  font-family: 'Dela Gothic One', cursive;
+  margin-bottom: 20px;
 }
 
 .test-form {
   display: grid;
   background-color: #f9a2c2;
+  padding: 20px;
+  border-radius: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#symptom-list label {
+  display: flex;
+  text-align: left;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #6b0d33;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+}
+
+#symptom-list input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #a61e4d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#symptom-list input[type='checkbox']:hover {
+  transform: scale(1.1);
+}
+
+#symptom-list label {
+  display: block;
+  margin-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+button {
+  background-color: #a8325c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #8c2a4c;
+}
+
+#result {
+  margin-top: 30px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #333;
+  width: 100%;
+}
+
+#result ul {
+  margin-top: 10px;
+  padding-left: 20px;
+  text-align: left;
+}
+
+#result li {
+  margin-bottom: 6px;
 }

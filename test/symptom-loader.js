@@ -23,7 +23,7 @@ async function loadSymptoms() {
       (symptom) => `
         <label>
           <input type="checkbox" name="symptom" value="${symptom._id}" />
-          ${symptom.name}
+          ${symptom.description}
         </label><br />
       `,
     )
