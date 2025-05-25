@@ -1,0 +1,23 @@
+'use strict';
+const mongoose = require('mongoose');
+
+const resultSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref:'User'
+    },
+    recomendedVitamins: {
+        type: [
+            {
+                type: String
+            }
+        ]
+    },
+    date:{
+        type: Date,
+        default: Date.now()
+    }
+})
+
+const Result = mongoose.model('Result', resultSchema)
+module.exports = Result;

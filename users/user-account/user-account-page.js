@@ -1,12 +1,15 @@
 const btnExit = document.querySelector('.exit--btn');
 const btnUsers = document.querySelector('.users--btn');
 const btnClose = document.querySelector('.close--btn');
+const resultContainer = document.querySelector('.result-container');
+const btnShow = document.querySelector('.show--btn')
 const table = document.querySelector('.users--table');
 const body = table.querySelector('tbody');
 const labelMessage = document.querySelector('.message1');
 const API1 = 'http://localhost:3000/api/profile';
 const API2 = 'http://localhost:3000/api/exit';
 const API3 = 'http://localhost:3000/api/getAllUsers';
+const API4 = 'http://localhost:3000/api/get-results';
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -108,3 +111,36 @@ btnExit.addEventListener('click', async () => {
     labelMessage.textContent = err.message;
   }
 });
+
+btnShow.addEventListener('click', async () => {
+  try{
+    const res = await fetch(API4, {
+      method:'GET',
+      credentials:'include',
+      headers:{
+        'Content-Type':'application/json'
+      }
+    })
+    const resJ = await res.json();
+    const results = resJ.message.results
+
+    if (!results || results.length === 0) {
+      resultContainer.innerHTML = '<p>No results found.</p>';
+      return;
+    }
+
+    results.forEach(result => {
+      const vitamins = result.recomendedVitamins.join(', ');
+      const created = new Date(result.date).toLocaleString();
+      const resultHTML = `
+        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          <p><strong>Recommended Vitamins:</strong> ${vitamins}</p>
+          <p><strong>Date:</strong> ${created}</p>
+        </div>
+      `;
+      resultContainer.insertAdjacentHTML('beforeend', resultHTML);
+    });
+  }catch(err){
+    labelMessage.textContent = err.message;
+  }
+})

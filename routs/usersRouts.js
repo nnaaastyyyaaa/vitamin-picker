@@ -2,13 +2,14 @@
 
 const crypto = require('crypto');
 const User = require('../users/userSchema');
+const Result = require('../test/resultSchema')
 const { memoize } = require('../users/tools/memoization');
 const { throwError } = require('../users/tools/throwError');
 const { sendEmail } = require('../users/tools/apiProxy');
 const memoizedFindUser = memoize((email) => User.findOne({ eMail: email }));
 
 const sendResponse = (res, message, status = 200) => {
-  res.status(status).send({ message });
+  res.code(status).send({ message });
 };
 
 const createSession = async (req, user) => {
@@ -30,7 +31,7 @@ const deleteSession = (req, res) => {
   });
 };
 
-const checkSession = (requiredRole = null) => {
+const checkSession = (fn, requiredRole = null) => {
   return async function (req, res) {
     if (!req.session.userId) {
       throwError(403, 'You aren`t authorised!');
@@ -43,6 +44,7 @@ const checkSession = (requiredRole = null) => {
       throwError(403, 'You aren`t allowed to do this request!');
     }
     req.user = user;
+    await fn(req, res)
   };
 };
 
@@ -197,20 +199,35 @@ const getAllUsers = async (req, res) => {
   });
 };
 
+const saveResult = async (req, res) => {
+  const {vitaminNames} = req.body;
+  const user = req.user;
+  const result = await Result.create({
+    user: user._id,
+    recomendedVitamins: vitaminNames
+  })
+  await User.findByIdAndUpdate(user._id, { $push: {results: result._id}})
+  sendResponse(res, 'Result added to user', 201);
+}
+
+const getResults = async (req, res) => {
+  const user = req.user;
+  const results = await User.findById(user).select('results').populate('results');
+
+  sendResponse(res, results)
+}
 async function userRoutes(fastify, options) {
   fastify.post('/login', createUser);
   fastify.post('/sign-in', checkUser);
-  fastify.get('/profile', { preHandler: [checkSession()] }, getProfile);
+  fastify.get('/profile', checkSession(getProfile));
   fastify.post('/forget', forgotPassword);
   fastify.patch('/reset/:token', resetPassword);
   fastify.get('/reset/:token', getResetPage);
-  fastify.get('/exit', { preHandler: [checkSession()] }, logOut);
-  fastify.delete('/delete', { preHandler: [checkSession()] }, deleteUser);
-  fastify.get(
-    '/getAllUsers',
-    { preHandler: [checkSession('admin')] },
-    getAllUsers,
-  );
+  fastify.get('/exit', checkSession(logOut));
+  fastify.delete('/delete', checkSession(deleteUser));
+  fastify.get('/getAllUsers', checkSession(getAllUsers, 'admin'));
+  fastify.post('/save-result', checkSession(saveResult));
+  fastify.get('/get-results',checkSession(getResults))
 }
 
 module.exports = userRoutes;

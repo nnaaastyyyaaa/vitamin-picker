@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  results:[{
+    type: mongoose.Schema.ObjectId,
+    ref:'Result'
+  }],
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpire: Date,
