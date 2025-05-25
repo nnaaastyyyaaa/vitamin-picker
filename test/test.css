@@ -26,7 +26,8 @@ body {
 
 h2 {
   color: #a61e4d;
-  font-family: 'Dela Gothic One', cursive;
+  font-family: 'Dela Gothic One';
+  font-weight: 300;
   margin-bottom: 20px;
 }
 

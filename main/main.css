@@ -17,18 +17,32 @@ body {
   box-sizing: border-box;
   padding: 0 15px;
   width: 100%;
+  min-height: 100px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-h1 {
+.catalogue-btn {
   font-size: 36px;
-  font-weight: 700;
-
+  font-weight: 800;
+  color: #077f5b;
   text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.3s, transform 0.3s;
+}
 
+.catalogue-btn:hover {
+  color: #e91e63;
+  transform: scale(1.1);
+}
+
+.catalogue-btn:visited,
+:link {
+  color: #077f5b;
+  text-decoration: none;
   text-transform: uppercase;
 }
 
